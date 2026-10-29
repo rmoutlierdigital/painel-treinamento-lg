@@ -1,1 +1,276 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Painel de Treinamento LG</title>
 
+<style>
+body{
+    margin:0;
+    font-family:Arial,sans-serif;
+    background:#f4f6f9;
+}
+
+header{
+    background:#c8102e;
+    color:white;
+    text-align:center;
+    padding:20px;
+}
+
+.container{
+    max-width:1200px;
+    margin:auto;
+    padding:20px;
+}
+
+.card{
+    background:white;
+    padding:20px;
+    border-radius:10px;
+    box-shadow:0 2px 8px rgba(0,0,0,.1);
+    margin-bottom:20px;
+}
+
+.cards{
+    display:grid;
+    grid-template-columns:repeat(auto-fit,minmax(220px,1fr));
+    gap:15px;
+}
+
+.numero{
+    font-size:32px;
+    font-weight:bold;
+    color:#c8102e;
+}
+
+.barra{
+    width:100%;
+    height:30px;
+    background:#ddd;
+    border-radius:20px;
+    overflow:hidden;
+}
+
+.preenchimento{
+    height:100%;
+    background:#c8102e;
+    width:0%;
+    transition:.4s;
+}
+
+input{
+    width:100%;
+    padding:10px;
+    border:1px solid #ccc;
+    border-radius:5px;
+    margin-bottom:20px;
+    box-sizing:border-box;
+}
+
+table{
+    width:100%;
+    border-collapse:collapse;
+    background:white;
+}
+
+th{
+    background:#c8102e;
+    color:white;
+    padding:10px;
+}
+
+td{
+    border:1px solid #ddd;
+    padding:10px;
+    text-align:center;
+}
+
+button{
+    background:#c8102e;
+    color:white;
+    border:none;
+    padding:7px 12px;
+    border-radius:5px;
+    cursor:pointer;
+}
+
+.concluido{
+    color:green;
+    font-weight:bold;
+}
+
+.pendente{
+    color:orange;
+    font-weight:bold;
+}
+</style>
+
+</head>
+<body>
+
+<header>
+    <h1>Painel de Treinamento LG</h1>
+</header>
+
+<div class="container">
+
+    <div class="card">
+        <h2>Information Security & Personal Information Protection</h2>
+        <p>Período: 27/10/2026 a 09/11/2026</p>
+    </div>
+
+    <div class="cards">
+
+        <div class="card">
+            <h3>Total</h3>
+            <div class="numero" id="total"></div>
+        </div>
+
+        <div class="card">
+            <h3>Concluídos</h3>
+            <div class="numero" id="concluidos"></div>
+        </div>
+
+        <div class="card">
+            <h3>Pendentes</h3>
+            <div class="numero" id="pendentes"></div>
+        </div>
+
+    </div>
+
+    <div class="card">
+        <h3>Progresso Geral</h3>
+
+        <div class="barra">
+            <div id="barra" class="preenchimento"></div>
+        </div>
+
+        <h2 id="percentual"></h2>
+    </div>
+
+    <input
+        type="text"
+        id="pesquisa"
+        placeholder="Pesquisar colaborador..."
+        onkeyup="atualizar()">
+
+    <table>
+        <thead>
+            <tr>
+                <th>Colaborador</th>
+                <th>Status</th>
+                <th>Ação</th>
+            </tr>
+        </thead>
+
+        <tbody id="tabela"></tbody>
+
+    </table>
+
+</div>
+
+<script>
+
+let colaboradores = [
+
+{ nome: "Axel Medina", status: false },
+{ nome: "Beatriz Gomes", status: false },
+{ nome: "Daybio Alexandre", status: false },
+{ nome: "Everllyn Santos", status: false },
+{ nome: "Gleice Lima", status: false },
+{ nome: "Idiamara Guedes", status: false },
+{ nome: "João Souza", status: true },
+{ nome: "Karla Oliveira", status: false },
+{ nome: "Laerte Souza", status: false },
+{ nome: "Marcia Neves", status: false },
+{ nome: "Raphael Santos", status: false },
+{ nome: "Rebeca Lira", status: false },
+{ nome: "Renan Melo", status: false },
+{ nome: "Renan Procópio", status: false },
+{ nome: "Rickison Queiroz", status: false },
+{ nome: "Simeia Batalha", status: false },
+{ nome: "Vitória Marques", status: false }
+
+];
+
+function atualizar(){
+
+    const pesquisa =
+    document.getElementById("pesquisa")
+    .value.toLowerCase();
+
+    const tabela =
+    document.getElementById("tabela");
+
+    tabela.innerHTML = "";
+
+    let concluidos = 0;
+
+    colaboradores.forEach((pessoa,index)=>{
+
+        if(!pessoa.nome.toLowerCase().includes(pesquisa)){
+            return;
+        }
+
+        if(pessoa.status){
+            concluidos++;
+        }
+
+        tabela.innerHTML += `
+        <tr>
+            <td>${pessoa.nome}</td>
+
+            <td class="${pessoa.status ? 'concluido' : 'pendente'}">
+                ${pessoa.status ? '✅ Concluído' : '⏳ Pendente'}
+            </td>
+
+            <td>
+                <button onclick="alterar(${index})">
+                    Alterar
+                </button>
+            </td>
+        </tr>
+        `;
+    });
+
+    const total = colaboradores.length;
+    const concluidosTotal =
+    colaboradores.filter(x => x.status).length;
+    const pendentes =
+    total - concluidosTotal;
+
+    const percentual =
+    Math.round((concluidosTotal / total) * 100);
+
+    document.getElementById("total").innerText =
+    total;
+
+    document.getElementById("concluidos").innerText =
+    concluidosTotal;
+
+    document.getElementById("pendentes").innerText =
+    pendentes;
+
+    document.getElementById("percentual").innerText =
+    percentual + "%";
+
+    document.getElementById("barra").style.width =
+    percentual + "%";
+}
+
+function alterar(index){
+
+    colaboradores[index].status =
+    !colaboradores[index].status;
+
+    atualizar();
+}
+
+atualizar();
+
+</script>
+
+</body>
+</html>
